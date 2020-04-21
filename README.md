@@ -35,7 +35,9 @@ Re-designed Pipeline input - using the pipeline can be performed bulk updates. T
 - C:\Program Files\WindowsPowerShell\Modules - If you want the module to be available for all user on the machine
 - Or any other location present in $env:PSModulePath
 5. Run the following command replacing "PathWhereModuleIsInstalled" with the actual path where the module files were unzipped.
+```powershell
 Get-ChildItem -Path "PathWhereModuleIsInstalled" -Recurse | Unblock-File
+```
 6. PowerShell Examples:
 
 ```powershell
