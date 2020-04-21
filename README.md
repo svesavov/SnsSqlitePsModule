@@ -150,7 +150,7 @@ Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "SELECT COUNT(*) FROM tbl";
 
 ```
 
-## Notes
+## External Links
 
 - RamblingCookieMonster / PSSQLite: [https://github.com/RamblingCookieMonster/PSSQLite](https://github.com/RamblingCookieMonster/PSSQLite)
 - SQLite V3 Data Types: [https://www.sqlite.org/datatype3.html](https://www.sqlite.org/datatype3.html)
