@@ -1,7 +1,7 @@
 SnsSqlitePsModule PowerShell Module
 =============
 
-This is a PowerShell module for working with SQLite based on Warren Frame's (RamblingCookieMonster) and his contributors project Named ["PSSQLite"](https://github.com/RamblingCookieMonster/PSSQLite).
+This is a PowerShell module for working with SQLite, based on Warren Frame's (RamblingCookieMonster) and his contributors project, Named ["PSSQLite"](https://github.com/RamblingCookieMonster/PSSQLite).
 The reason to make my own Binary PSModule written on C# is mainly related with performance as it can be seen on the screenshot:
 ![Performance Test Generate Data](/Media/GenerateInput.JPG)
 ![Performance Test Inserting Process](/Media/InvokeQryInAction.JPG)
