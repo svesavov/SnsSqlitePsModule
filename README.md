@@ -5,7 +5,12 @@ This is a PowerShell module for working with [SQLite](https://www.sqlite.org) Da
 The reason to make my own Binary PSModule written on C# is mainly related with performance as it can be seen on the screenshot:
 ![Performance Test Generate Data](/Media/GenerateData.JPG)
 ![Performance Test Insert Data Via Pipeline](/Media/InsertViaPipeline.JPG)
-As it can be seen binary CmdLet is much faster than PowerShell ForEach loop. Considering the fact that the binary CmdLet have 1000+ lines. Additionally sending the data via the pipeline boost the performance as well. ProgressBar is not used when objects coming from Pipeline, because the CmdLet cannot estimate the number of coming objects. The PowerShell extras are the factors that reduce the performance a lot, such like ProgressBar, Verbose Stream, Debug Stream and every information displayed on the host window. It is highly recommended whenever large number of objects is processed, to avoid using Verbose parameter and possibly send the data via the Pipeline. The following screenshot contains the same test but the data is provided to the CmdLet via the parameter instead via Pipeline:
+As it can be seen binary CmdLet is much faster than PowerShell ForEach loop, having in mind that this CmdLet have 1000+ lines.
+Sending data via the Pipeline boosts the performance additionally.
+ProgressBar can't be used when objects are coming from Pipeline, because the CmdLet can’t estimate their number.
+The PowerShell "extras" are the factors that decrease the performance by a lot, such like ProgressBar, Verbose Stream, Debug Stream and every information displayed on the host window.
+It is highly recommended, whenever large number of objects is processed, to avoid using Verbose, Debug and possibly send the data via the Pipeline.
+The following screenshot contains the same test, but the data is provided to the CmdLet via parameters instead of Pipeline:
 ![Performance Test ProgressBar](/Media/ProgressBar.JPG)
 ![Performance Test Insert Data Via Parameters](/Media/InsertDataViaParam.JPG)
 
@@ -31,6 +36,8 @@ For additional information, please use the CmdLets built-in help.
 ```powershell
 Get-Help Invoke-SnsSqliteQuery -Full;
 ```
+
+## Requirements
 
 ## Instructions
 
