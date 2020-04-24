@@ -34,10 +34,16 @@ Re-designed Pipeline input - using the pipeline can be performed bulk updates. T
 
 For additional information, please use the CmdLets built-in help.
 ```powershell
+Get-Help New-SnsSqliteConnection -Full; 
 Get-Help Invoke-SnsSqliteQuery -Full;
 ```
 
+
 ## Requirements
+
+.NET Framework 4.5
+PowerShell 4
+
 
 ## Instructions
 
@@ -45,7 +51,7 @@ Get-Help Invoke-SnsSqliteQuery -Full;
 2. Don't forget to check the .ZIP file for viruses and etc.
 3. File MD5 hash: 9BD48464E3AA6D8DDD7C85F6F55D727E
 4. Unzip in one of the following folders depending of the preference:
-* C:\Users\UserName\Documents\WindowsPowerShell\Modules - Replace "UserName" with the actual username, Use this location if you want the module available for specific user
+* C:\Users\UserName\Documents\WindowsPowerShell\Modules - Replace "UserName" with the actual username. Use this location if you want the module available for specific user
 * C:\Program Files\WindowsPowerShell\Modules - Use this location if you want the module available for all users on the machine.
 * Or any other location present in $env:PSModulePath
 5. Run the following command replacing "PathWhereModuleIsInstalled" with the actual path where the module files were unzipped.
@@ -165,7 +171,7 @@ $Output | Select-Object -First 10;
 
 
 # Create permanent SQLiteConnection object to the existing DataBase
-# Create the Backup DataBase protected with the same Password
+# Create the Backup DataBase protected with the same Password and connect to it
 $ProdConn, $BkpConn = New-SnsSqliteConnection `
 	-DataBase "temp.sqlite", "Backup.sqlite" `
 	-Password "Pass" `
