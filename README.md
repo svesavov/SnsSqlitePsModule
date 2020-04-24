@@ -5,9 +5,9 @@ This is a PowerShell module for working with [SQLite](https://www.sqlite.org) Da
 The reason to make my own Binary PSModule written on C# is mainly related with performance as it can be seen on the screenshot:
 ![Performance Test Generate Data](/Media/GenerateData.JPG)
 ![Performance Test Insert Data Via Pipeline](/Media/InsertViaPipeline.JPG)
-As it can be seen binary CmdLet is much faster than PowerShell ForEach loop. Considering the fact that the binary CmdLet have 1000+ lines. Additionally sending the data via the pipeline boost the performance as well, since the CmdLet cannot estimate the number of objects and ProgressBar is not used. The PowerShell extras are the factors that reduce the performance a lot, such like ProgressBar, Verbose Stream and every information displayed on the host window. It is highly recommended whenever large number of objects is processed, to avoid using Verbose parameter and possible send the data via the Pipeline. The following screenshot contains the same test but the data is provided to the CmdLet via the parameter instead of via Pipeline:
-![Performance Test Insert Data Via Pipeline](/Media/ProgressBar.JPG)
-![Performance Test Insert Data Via Pipeline](/Media/InsertDataViaParam.JPG)
+As it can be seen binary CmdLet is much faster than PowerShell ForEach loop. Considering the fact that the binary CmdLet have 1000+ lines. Additionally sending the data via the pipeline boost the performance as well. ProgressBar is not used when objects coming from Pipeline, because the CmdLet cannot estimate the number of coming objects. The PowerShell extras are the factors that reduce the performance a lot, such like ProgressBar, Verbose Stream, Debug Stream and every information displayed on the host window. It is highly recommended whenever large number of objects is processed, to avoid using Verbose parameter and possibly send the data via the Pipeline. The following screenshot contains the same test but the data is provided to the CmdLet via the parameter instead via Pipeline:
+![Performance Test ProgressBar](/Media/ProgressBar.JPG)
+![Performance Test Insert Data Via Parameters](/Media/InsertDataViaParam.JPG)
 
 
 ## Functionality
@@ -119,7 +119,7 @@ $Output | Select-Object -First 10;
 
 ```
 
-* Insert Data without using the Pipeline, and verify the insert.
+* Insert data without using the Pipeline, and verify the insert.
 ```powershell
 
 
@@ -262,15 +262,14 @@ Invoke-SnsSqliteQuery `
 
 
 ```
-For me makes no sense to convert objects to DataSet and afterward convert the DataSet to SQL Queries. From that perspective there is no need of CmdLets "Invoke-SqliteBulkCopy" and "Out-DataTable" in Warren’s PS module.
-If I mange to find time in the future might create a CmdLet for bulk insert in future using the logic in the example. Moreover "Invoke-SnsSqliteQuery" uses SQLiteDataAdapter objects which leaves some room to squeeze more performance on insert queries using ExecuteNonQuery() Method.
+If I manage to find time in the future, might create a CmdLet for bulk insert using the logic in the example. Moreover "Invoke-SnsSqliteQuery" uses SQLiteDataAdapter objects which leaves some room to squeeze more performance on insert queries using ExecuteNonQuery() Method.
 
 
 ## External Links
 
 - svesavov on GitHub: [https://github.com/svesavov](https://github.com/svesavov)
+- Svetoslav Savov on LinkedIn [www.linkedin.com/in/svetoslavsavov](www.linkedin.com/in/svetoslavsavov)
 - RamblingCookieMonster / PSSQLite: [https://github.com/RamblingCookieMonster/PSSQLite](https://github.com/RamblingCookieMonster/PSSQLite)
 - SQLite V3 Data Types: [https://www.sqlite.org/datatype3.html](https://www.sqlite.org/datatype3.html)
 - SQLite V3 Supported SQL Syntax: [https://www.sqlite.org/lang.html](https://www.sqlite.org/lang.html)
 - SQLite V3 Pragma Statements: [http://www.sqlite.org/pragma.html](http://www.sqlite.org/pragma.html)
-
