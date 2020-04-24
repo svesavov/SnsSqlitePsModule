@@ -157,7 +157,8 @@ $Output | Select-Object -First 10;
 ```powershell
 
 
-# Create permanent SQLiteConnection object to the existing DataBases and create the Backup DataBase protected with the same Password
+# Create permanent SQLiteConnection object to the existing DataBase
+# Create the Backup DataBase protected with the same Password
 $ProdConn, $BkpConn = New-SnsSqliteConnection `
 	-DataBase "temp.sqlite", "Backup.sqlite" `
 	-Password "Pass" `
