@@ -1,5 +1,8 @@
-SnsSqlitePsModule PowerShell Module
-=============
+###### If you like it, please consider a beer.
+###### [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://PayPal.Me/svesavov)
+
+
+# SnsSqlitePsModule PowerShell Module
 
 This is a PowerShell module for working with [SQLite](https://www.sqlite.org) DataBases, based on Warren Frame's (RamblingCookieMonster) and his contributors project, named ["PSSQLite"](https://github.com/RamblingCookieMonster/PSSQLite).
 The reason to make my own Binary PSModule written on C# is mainly related with performance as it can be seen on the screenshot:
@@ -41,19 +44,19 @@ Get-Help Invoke-SnsSqliteQuery -Full;
 
 ## Requirements
 
-.NET Framework 4.5
-PowerShell 4
+* .NET Framework 4.5
+* PowerShell 4
 
 
 ## Instructions
 
-1. Download SnsSqlitePsModule.zip
+1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: 9BD48464E3AA6D8DDD7C85F6F55D727E
-4. Unzip in one of the following folders depending of the preference:
-* C:\Users\UserName\Documents\WindowsPowerShell\Modules - Replace "UserName" with the actual username. Use this location if you want the module available for specific user
-* C:\Program Files\WindowsPowerShell\Modules - Use this location if you want the module available for all users on the machine.
-* Or any other location present in $env:PSModulePath
+3. File MD5 hash: `9BD48464E3AA6D8DDD7C85F6F55D727E`
+4. Unzip in one of the following folders depending of your preference:
+* `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
+* `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
+* Or any other location present in `$env:PSModulePath`
 5. Run the following command replacing "PathWhereModuleIsInstalled" with the actual path where the module files were unzipped.
 ```powershell
 Get-ChildItem -Path "PathWhereModuleIsInstalled" -Recurse | Unblock-File
@@ -287,5 +290,3 @@ If I manage to find time in the future, might create a CmdLet for bulk insert us
 - SQLite V3 Data Types: [https://www.sqlite.org/datatype3.html](https://www.sqlite.org/datatype3.html)
 - SQLite V3 Supported SQL Syntax: [https://www.sqlite.org/lang.html](https://www.sqlite.org/lang.html)
 - SQLite V3 Pragma Statements: [http://www.sqlite.org/pragma.html](http://www.sqlite.org/pragma.html)
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://PayPal.Me/svesavov)
