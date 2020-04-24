@@ -282,7 +282,7 @@ If I manage to find time in the future, might create a CmdLet for bulk insert us
 ## External Links
 
 - svesavov on GitHub: [https://github.com/svesavov](https://github.com/svesavov)
-- Svetoslav Savov on LinkedIn [www.linkedin.com/in/svetoslavsavov](www.linkedin.com/in/svetoslavsavov)
+- Svetoslav Savov on LinkedIn [www.linkedin.com/in/svetoslavsavov.html](www.linkedin.com/in/svetoslavsavov.html)
 - RamblingCookieMonster / PSSQLite: [https://github.com/RamblingCookieMonster/PSSQLite](https://github.com/RamblingCookieMonster/PSSQLite)
 - SQLite V3 Data Types: [https://www.sqlite.org/datatype3.html](https://www.sqlite.org/datatype3.html)
 - SQLite V3 Supported SQL Syntax: [https://www.sqlite.org/lang.html](https://www.sqlite.org/lang.html)
