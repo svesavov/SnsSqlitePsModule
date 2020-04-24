@@ -1,5 +1,5 @@
 ###### If you like it, please consider a beer.
-###### [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://PayPal.Me/svesavov)
+###### [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6NKR7XQH5E2P2&source=url)
 
 
 # SnsSqlitePsModule PowerShell Module
