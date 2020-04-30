@@ -53,7 +53,7 @@ Get-Help Invoke-SnsSqliteQuery -Full;
 
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `E20CE0D0D5F3C4511CB14489CA1FE6CF`
+3. File MD5 hash: `E8A3D0D6418A1A3A90300169D44ED969`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
