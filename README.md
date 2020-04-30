@@ -53,7 +53,7 @@ Get-Help Invoke-SnsSqliteQuery -Full;
 
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `9BD48464E3AA6D8DDD7C85F6F55D727E`
+3. File MD5 hash: `E20CE0D0D5F3C4511CB14489CA1FE6CF`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
@@ -288,6 +288,10 @@ If I manage to find time in the future, might create a CmdLet for bulk insert us
 - svesavov on GitHub: [https://github.com/svesavov](https://github.com/svesavov)
 - Svetoslav Savov on LinkedIn [https://www.linkedin.com/in/svetoslavsavov](https://www.linkedin.com/in/svetoslavsavov)
 - RamblingCookieMonster / PSSQLite: [https://github.com/RamblingCookieMonster/PSSQLite](https://github.com/RamblingCookieMonster/PSSQLite)
+- SQLite V3: [https://sqlite.org/index.html](https://sqlite.org/index.html)
 - SQLite V3 Data Types: [https://www.sqlite.org/datatype3.html](https://www.sqlite.org/datatype3.html)
 - SQLite V3 Supported SQL Syntax: [https://www.sqlite.org/lang.html](https://www.sqlite.org/lang.html)
 - SQLite V3 Pragma Statements: [http://www.sqlite.org/pragma.html](http://www.sqlite.org/pragma.html)
+- SQLite Tutorials: [https://www.sqlitetutorial.net/](https://www.sqlitetutorial.net/)
+- SQLite Studio: [https://github.com/pawelsalawa/sqlitestudio/releases](https://github.com/pawelsalawa/sqlitestudio/releases)
+
