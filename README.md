@@ -9,6 +9,8 @@ This is a PowerShell module for working with [SQLite](https://www.sqlite.org) Da
 The reason to make my own Binary PSModule written on C# is mainly related with performance as it can be seen on the screenshot:
 ![Performance Test Generate Data](/Media/GenerateData.JPG)
 ![Performance Test Insert Data Via Pipeline](/Media/InsertViaPipeline.JPG)
+![Performance Test Generate Objects Collection](/Media/GenerateObjects.JPG)
+![Performance Test Insert Objects Via Pipeline](/Media/InsertObjViaPipeline.JPG)
 As it can be seen binary CmdLet is much faster than PowerShell ForEach loop, having in mind that this CmdLet have 1000+ lines.
 Sending data via the Pipeline boosts the performance additionally.
 ProgressBar can't be used when objects are coming from Pipeline, because the CmdLet can’t estimate their number.
@@ -17,6 +19,7 @@ It is highly recommended, whenever large number of objects is processed, to avoi
 The following screenshot contains the same test, but the data is provided to the CmdLet via parameters instead of Pipeline:
 ![Performance Test ProgressBar](/Media/ProgressBar.JPG)
 ![Performance Test Insert Data Via Parameters](/Media/InsertDataViaParam.JPG)
+![Performance Test Insert Objects Collection Via Parameters](/Media/InsertObjectsViaParam.JPG)
 
 
 ## Functionality
@@ -30,6 +33,9 @@ Query a SQLite database. The results are filtered in PS to be shown the time req
 Create a SQLite connection, use it for maintenance or subsequent queries to avoid verifications repetition:
   * ![Create 2 SQLite connections with new DataBase creation and Backup](/Media/DbBackup.JPG)
 
+Insert PowerShell Objects into specified Table within specified DataSource
+  * ![Bulk Insert Of PowerShell Objects](/Media/ObjectsInsert.JPG)
+
 Built-in performance measurement accessible in Verbose stream.
   * ![Truncate SQLite table](/Media/TruncateTable.JPG)
 
@@ -40,6 +46,7 @@ For additional information, please use the CmdLets built-in help.
 ```powershell
 Get-Help New-SnsSqliteConnection -Full; 
 Get-Help Invoke-SnsSqliteQuery -Full;
+Get-Help Invoke-SnsSqliteObjectInsert -Full;
 ```
 
 
@@ -53,7 +60,7 @@ Get-Help Invoke-SnsSqliteQuery -Full;
 
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `E8A3D0D6418A1A3A90300169D44ED969`
+3. File MD5 hash: `17D58D9EAE10982F3F17EDC456F6BEBC`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
@@ -272,6 +279,7 @@ $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Date" -Value ([
 		-Password "Pass" `
 		-Verbose;
 
+
 # Verify the data inserting
 Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
@@ -280,7 +288,83 @@ Invoke-SnsSqliteQuery `
 
 
 ```
-If I manage to find time in the future, might create a CmdLet for bulk insert using the logic in the example. Moreover "Invoke-SnsSqliteQuery" uses SQLiteDataAdapter objects which leaves some room to squeeze more performance on insert queries using ExecuteNonQuery() Method.
+
+* Example of how to insert a collection of objects without to convert them to hash tables in advance.
+The object properties must match the destination table column names exactly. The values in the object properties must have type, either some of the struct types or string class. Values from any other classes might lead to unexpected results as for example instead of the actual value to be inserted the object type.
+As it can be seen on the screenshots above, using of dedicated Cmdlet for SQL INSERT using ExecuteNonQuery() method, does not provide any performance benefits, than using SQLiteDataAdapter object, but dedicated CmdLet for SQL INSERT at least simplify the scripts which will use it by removing the additional overhead to convert the objects to hash tables.
+```powershell
+
+
+# Create new DataBase and a table with the specified schema
+Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Verbose `
+	-Query "CREATE TABLE [tbl] (ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Event VARCHAR(20) NOT NULL, Date DATETIME NOT NULL);";
+
+
+# Generate some test data
+[System.DateTime]$cmdStart = [System.DateTime]::Now;
+[System.Object[]]$arrInput = @();
+0..100000 | ForEach `
+{
+	[System.Int32]$intI = $_;
+	[System.Object]$objObject = New-Object -TypeName "System.Object";
+	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "id" -Value $intI;
+	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "event" -Value "Warning";
+	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "date" -Value ([System.DateTime]::Now);
+	[System.Object[]]$arrInput += $objObject
+}
+[System.DateTime]::Now - $cmdStart;
+
+
+# Insert the generated test objects collection without using the pipeline
+# The property that corresponds to the table's Primary Key will be ignored
+# In the progressbar can be seen the automatically generated query and the used SQL parameters
+[System.DateTime]$cmdStart = [System.DateTime]::Now;
+Invoke-SnsSqliteObjectInsert -DataBase "C:\TempDB\temp.sqlite" -Table "tbl" -InputObject $arrInput -SkipPrimaryKey;
+[System.DateTime]::Now - $cmdStart;
+
+
+# Verify the insert the entries are filtered in PowerShell after full amount of data retrieval to evaluate the performance
+# As it can be seen in the output the ID column was not used
+# The ID's of the generated objects starts with 0 while the ID's of the Database rows starts with 1
+$CmdStart = [System.DateTime]::now;
+$Output = Invoke-SnsSqliteQuery `
+	-DataBase "C:\TempDB\temp.sqlite" `
+	-Query "SELECT * FROM [tbl];";
+[System.DateTime]::now - $CmdStart;
+$Output | Select-Object -First 10;
+
+
+# Count the rows in the table as we filtered to the first 10 entries
+Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "SELECT COUNT(*) FROM tbl;" -Verbose;
+
+
+# Truncate the table to prepare it for the next test
+Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "DELETE FROM [tbl];" -Verbose;
+
+
+# Insert the same objects collection using Pipeline
+# The performance boost is significant
+[System.DateTime]$cmdStart = [System.DateTime]::Now;
+$arrInput | Invoke-SnsSqliteObjectInsert -DataBase "C:\TempDB\temp.sqlite" -Table "tbl";
+[System.DateTime]::Now - $cmdStart;
+
+
+# Verify the insert
+# As we did not used SkipPrimaryKey the ID property is used in the insert
+# the ID's of the DataBase entries match exactly the ID's in the objects collection
+$CmdStart = [System.DateTime]::now;
+$Output = Invoke-SnsSqliteQuery `
+	-DataBase "C:\TempDB\temp.sqlite" `
+	-Query "SELECT * FROM [tbl];";
+[System.DateTime]::now - $CmdStart;
+$Output | Select-Object -First 10;
+
+
+# Count the rows in the table as we filtered to the first 10 entries
+Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "SELECT COUNT(*) FROM tbl;" -Verbose;
+
+
+```
 
 
 ## External Links
