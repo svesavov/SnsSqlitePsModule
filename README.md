@@ -60,7 +60,7 @@ Get-Help Invoke-SnsSqliteObjectInsert -Full;
 
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `17D58D9EAE10982F3F17EDC456F6BEBC`
+3. File MD5 hash: `79819038B2BCF933AF9A00BC59BAB065`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
