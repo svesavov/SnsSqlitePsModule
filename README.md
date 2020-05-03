@@ -58,6 +58,11 @@ Get-Help Invoke-SnsSqliteObjectInsert -Full;
 
 ## Instructions
 
+Simply run
+```powershell
+Install-Module "SnsSqlitePsModule" -Scope "AllUsers";
+```
+OR
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
 3. File MD5 hash: `79819038B2BCF933AF9A00BC59BAB065`
