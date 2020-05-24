@@ -65,7 +65,7 @@ Install-Module "SnsSqlitePsModule" -Scope "AllUsers";
 OR
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `27A3FD91A54A61A53831EE293B3F5978`
+3. File MD5 hash: `A93056E6E0D7211AD6B36C6FC1B0E2C6`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
@@ -375,6 +375,7 @@ Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "SELECT COUNT(*) 
 ## External Links
 
 - svesavov on GitHub: [https://github.com/svesavov](https://github.com/svesavov)
+- svesavov on PowerShell Gallery: [https://www.powershellgallery.com/packages/SnsSqlitePsModule/](https://www.powershellgallery.com/packages/SnsSqlitePsModule/)
 - Svetoslav Savov on LinkedIn [https://www.linkedin.com/in/svetoslavsavov](https://www.linkedin.com/in/svetoslavsavov)
 - RamblingCookieMonster / PSSQLite: [https://github.com/RamblingCookieMonster/PSSQLite](https://github.com/RamblingCookieMonster/PSSQLite)
 - SQLite V3: [https://sqlite.org/index.html](https://sqlite.org/index.html)
