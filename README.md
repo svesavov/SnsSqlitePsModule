@@ -65,7 +65,7 @@ Install-Module "SnsSqlitePsModule" -Scope "AllUsers";
 OR
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `F2EE6F09FD82D15631DB928E334728AA`
+3. File MD5 hash: `9D37BCCFC20ECFC875CAA745FE67D94A`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
@@ -82,6 +82,7 @@ Get-ChildItem -Path "PathWhereModuleIsInstalled" -Recurse | Unblock-File
 
 # Import the Module
 Import-Module "SnsSqlitePsModule";
+cd C:\TempDB\
 
 
 # Create "temp.sqlite" DataBase in the working folder and "tbl" table inside the DB
@@ -182,7 +183,7 @@ $Output | Select-Object -First 10;
 
 ```
 
-* Backup DataBase
+* Backup DataBase using "BackupDatabase" method of SQLiteConnection object
 ```powershell
 
 
@@ -203,6 +204,49 @@ $ProdConn.BackupDatabase($BkpConn, "main", "main", -1, $null, 0);
 # Verify whether the data is copied to the new database using the existing permanent connection
 Invoke-SnsSqliteQuery `
 	-SQLiteConnection $BkpConn `
+	-Query "SELECT COUNT(*) FROM tbl;" `
+	-Verbose;
+
+
+# Close Both Connections
+$ProdConn.Close();
+$ProdConn.Dispose();
+$BkpConn.Close();
+$BkpConn.Dispose();
+
+
+```
+
+
+* Backup DataBase using Backup-SnsSqliteDataBase CmdLet
+```powershell
+
+
+# Backup The Database
+# Initially I've thought that there will be no need of such command
+# However when backing up using the "BackupDatabase" method in scripts, they have to handle so many exceptions
+# So I've created the command to not handle the same exceptions over and over again inside scripts
+$Output = Backup-SnsSqliteDataBase `
+	-DataBase "temp.sqlite" `
+	-Destination "Backup2.sqlite" `
+	-Password "Pass" `
+	-Force `
+	-PassThru `
+	-Verbose;
+
+
+# When PassThru is specified to Backup-SnsSqliteDataBase CmdLet
+# It reverts a string with the absolute path of the Backup DataBase
+# If backup has failed the string would be "Backup Filed"
+# The verification is made via comparing the source and the backup DataBases file size in bytes
+# If PassThru is not specified no verification is performed
+$Output
+
+
+# Verify whether the data is copied to the new database
+Invoke-SnsSqliteQuery `
+	-DataBase "Backup2.sqlite" `
+	-Password "Pass" `
 	-Query "SELECT COUNT(*) FROM tbl;" `
 	-Verbose;
 
@@ -301,6 +345,7 @@ As it can be seen on the screenshots above, using of dedicated Cmdlet for SQL IN
 
 
 # Create new DataBase and a table with the specified schema
+Remove-Item -Path "C:\TempDB\temp.sqlite" -Force -Confirm:$false;
 Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Verbose `
 	-Query "CREATE TABLE [tbl] (ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Event VARCHAR(20) NOT NULL, Date DATETIME NOT NULL);";
 
