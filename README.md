@@ -47,6 +47,7 @@ For additional information, please use the CmdLets built-in help.
 Get-Help New-SnsSqliteConnection -Full; 
 Get-Help Invoke-SnsSqliteQuery -Full;
 Get-Help Invoke-SnsSqliteObjectInsert -Full;
+Get-Help Backup-SnsSqliteDataBase -Full;
 ```
 
 
