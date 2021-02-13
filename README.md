@@ -66,7 +66,7 @@ Install-Module "SnsSqlitePsModule" -Scope "AllUsers";
 OR
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `9D37BCCFC20ECFC875CAA745FE67D94A`
+3. File MD5 hash: `49663B3B2D4E9084A09C8B0C3D08E228`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
