@@ -66,7 +66,7 @@ Install-Module "SnsSqlitePsModule" -Scope "AllUsers";
 OR
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `49663B3B2D4E9084A09C8B0C3D08E228`
+3. File MD5 hash: `37942ABF36A7DF53CA1C2D11D67A4015`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
@@ -90,7 +90,6 @@ cd C:\TempDB\
 Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
 	-Query "CREATE TABLE tbl (ID INTEGER, Event VARCHAR(20), Date DATETIME);" `
-	-Password "Pass" `
 	-ReadOnly `
 	-Verbose;
 
@@ -99,7 +98,6 @@ Invoke-SnsSqliteQuery `
 $Output = Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
 	-Query "PRAGMA table_info(tbl);" `
-	-Password "Pass" `
 	-ReadOnly `
 	-Verbose;
 $Output | ft
@@ -130,8 +128,7 @@ $CmdStart = [System.DateTime]::now;
 $CmdStart = [System.DateTime]::now;
 $Params | Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
-	-Query "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);" `
-	-Password "Pass";
+	-Query "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);";
 [System.DateTime]::now - $CmdStart;
 
 
@@ -142,8 +139,7 @@ $Params | Invoke-SnsSqliteQuery `
 $CmdStart = [System.DateTime]::now;
 $Output = Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
-	-Query "SELECT * FROM tbl;" `
-	-Password "Pass";
+	-Query "SELECT * FROM tbl;";
 [System.DateTime]::now - $CmdStart;
 $Output | Select-Object -First 10;
 
@@ -158,7 +154,6 @@ $Output | Select-Object -First 10;
 Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
 	-Query "DELETE FROM tbl;" `
-	-Password "Pass" `
 	-Verbose;
 
 
@@ -167,8 +162,7 @@ $CmdStart = [System.DateTime]::now;
 Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
 	-Query "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);" `
-	-SqlParameters $Params `
-	-Password "Pass";
+	-SqlParameters $Params;
 [System.DateTime]::now - $CmdStart;
 
 
@@ -176,8 +170,7 @@ Invoke-SnsSqliteQuery `
 $CmdStart = [System.DateTime]::now;
 $Output = Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
-	-Query "SELECT * FROM tbl;" `
-	-Password "Pass";
+	-Query "SELECT * FROM tbl;";
 [System.DateTime]::now - $CmdStart;
 $Output | Select-Object -First 10;
 
@@ -189,10 +182,9 @@ $Output | Select-Object -First 10;
 
 
 # Create permanent SQLiteConnection object to the existing DataBase
-# Create the Backup DataBase protected with the same Password and connect to it
+# Create the Backup DataBase and connect to it
 $ProdConn, $BkpConn = New-SnsSqliteConnection `
 	-DataBase "temp.sqlite", "Backup.sqlite" `
-	-Password "Pass" `
 	-ReadOnly;
 
 
@@ -230,7 +222,6 @@ $BkpConn.Dispose();
 $Output = Backup-SnsSqliteDataBase `
 	-DataBase "temp.sqlite" `
 	-Destination "Backup2.sqlite" `
-	-Password "Pass" `
 	-Force `
 	-PassThru `
 	-Verbose;
@@ -247,7 +238,6 @@ $Output
 # Verify whether the data is copied to the new database
 Invoke-SnsSqliteQuery `
 	-DataBase "Backup2.sqlite" `
-	-Password "Pass" `
 	-Query "SELECT COUNT(*) FROM tbl;" `
 	-Verbose;
 
@@ -290,7 +280,6 @@ $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "
 # Run All The 3 Queries
 $arrInput | Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
-	-Password "Pass" `
 	-Verbose | ft;
 
 
@@ -304,7 +293,6 @@ $arrInput | Invoke-SnsSqliteQuery `
 Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
 	-Query "DELETE FROM tbl;" `
-	-Password "Pass" `
 	-Verbose;
 
 
@@ -326,15 +314,13 @@ $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Date" -Value ([
 	Invoke-SnsSqliteQuery `
 		-DataBase "temp.sqlite" `
 		-Query "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);" `
-		-Password "Pass" `
 		-Verbose;
 
 
 # Verify the data inserting
 Invoke-SnsSqliteQuery `
 	-DataBase "temp.sqlite" `
-	-Query "SELECT * FROM tbl;" `
-	-Password "Pass" | ft;
+	-Query "SELECT * FROM tbl;" | ft;
 
 
 ```
