@@ -6,54 +6,57 @@
 # SnsSqlitePsModule PowerShell Module
 
 This is a PowerShell module for working with [SQLite](https://www.sqlite.org) DataBases, based on Warren Frame's (RamblingCookieMonster) and his contributors project, named ["PSSQLite"](https://github.com/RamblingCookieMonster/PSSQLite).
-The reason to make my own Binary PSModule written on C# is mainly related with performance as it can be seen on the screenshot:
-![Performance Test Generate Data](/Media/GenerateData.JPG)
-![Performance Test Insert Data Via Pipeline](/Media/InsertViaPipeline.JPG)
-![Performance Test Generate Objects Collection](/Media/GenerateObjects.JPG)
-![Performance Test Insert Objects Via Pipeline](/Media/InsertObjViaPipeline.JPG)
-As it can be seen binary CmdLet is much faster than PowerShell ForEach loop, having in mind that this CmdLet have 1000+ lines.
-Sending data via the Pipeline boosts the performance additionally.
-ProgressBar can't be used when objects are coming from Pipeline, because the CmdLet can’t estimate their number.
-The PowerShell "extras" are the factors that decrease the performance by a lot, such like ProgressBar, Verbose Stream, Debug Stream and every information displayed on the host window.
-It is highly recommended, whenever large number of objects is processed, to avoid using Verbose, Debug and possibly send the data via the Pipeline.
-The following screenshot contains the same test, but the data is provided to the CmdLet via parameters instead of Pipeline:
-![Performance Test ProgressBar](/Media/ProgressBar.JPG)
-![Performance Test Insert Data Via Parameters](/Media/InsertDataViaParam.JPG)
-![Performance Test Insert Objects Collection Via Parameters](/Media/InsertObjectsViaParam.JPG)
+The reason to make my own binary PSModule written on C# is related with performance. The binary CmdLets written on C# are much lighter and much faster compared with the ones written on PowerShell. This can be seen on the following screenshots:
+![Performance Test Generate Data](/Media/NewHashTableData.jpg)
+![Performance Test Insert Data Via Pipeline](/Media/InvokeSnsSqliteQueryInsertPipeline.jpg)
+![Performance Test Generate Objects Collection](/Media/NewObjectsData.jpg)
+![Performance Test Insert Objects Via Pipeline](/Media/InvokeSnsSqliteObjectInsertPipeline.jpg)
+Although those CmdLets have 1000+ lines each, they are much faster than PowerShell ForEach loop.
+Additional performance gain is the sending of the input via the Pipeline.
+It is highly recommended, whenever substantial number of objects is processed, to avoid using "Verbose", "Debug" and whenever possible to send the input via the Pipeline.
+The following screenshot contains the same test, but the input is provided to the CmdLet via parameters instead of using Pipeline:
+![Performance Test ProgressBar](/Media/ProgressBar.jpg)
+![Performance Test Insert Hashtable Collection Via Parameters](/Media/InvokeSnsSqliteQueryInsertParam.jpg)
+![Performance Test Insert Object Collection Via Parameters](/Media/InvokeSnsSqliteObjectInsertParam.jpg)
+When the CmdLets are called from a script run as a service not in interactive mode, they have no Progress Bar, this allows further gain in the performance.
 
 
 ## Functionality
 
-Create a SQLite database and table:
-  * ![Create a SQLite database and table](/Media/CreateDbAndTable.JPG)
+Create an SQLite database and table:
+  * ![Create a SQLite database and table](/Media/CreateDbAndTable.jpg)
 
-Query a SQLite database. The results are filtered in PS to be shown the time required to select the previously inserted amount of data:
-  * ![Query a SQLite database](/Media/QueryData.JPG)
+Query an SQLite database. The results are filtered in PS to be shown the time required to select the previously inserted amount of data:
+  * ![Query a SQLite database](/Media/InvokeSnsSqliteQuerySelect.jpg)
 
-Create a SQLite connection, use it for maintenance or subsequent queries to avoid verifications repetition:
-  * ![Create 2 SQLite connections with new DataBase creation and Backup](/Media/DbBackup.JPG)
+Bulk updates using Invoke-SnsSqliteQuery. Provides greater flexibility.
+  * ![Pipeline Input Using ValueFromPipelineByPropertyName](/Media/InvokeSnsSqliteQueryBulkInsert.jpg)
 
-Insert PowerShell Objects into specified Table within specified DataSource
-  * ![Bulk Insert Of PowerShell Objects](/Media/ObjectsInsert.JPG)
+Bulk updates using Invoke-SnsSqliteObjectInsert. Requires little to none knowledge of Structured Query Language.
+  * ![Bulk Insert Of PowerShell Objects](/Media/InvokeSnsSqliteObjectInsertPipeline.jpg)
+
+Create SQLite connections, use them for either backup or maintenance or subsequent queries:
+  * ![Create 2 SQLite connections with new DataBase creation and Backup](/Media/ManualDbBackup.jpg)
+
+Backup an SQLite database using Backup-SnsSqliteDataBase CmdLet.
+  * ![Backup an SQLite database](/Media/BackupSnsSqliteDataBase.jpg)
+
 
 Built-in performance measurement accessible in Verbose stream.
-  * ![Truncate SQLite table](/Media/TruncateTable.JPG)
-
-Re-designed Pipeline input - using the pipeline can be performed bulk updates. There is no need of additional command for bulk upload.
-  * ![Pipeline Input Using ValueFromPipelineByPropertyName](/Media/InsertViaPropertyNamePipeline.JPG)
+  * ![Truncate SQLite table](/Media/TruncateTable.jpg)
 
 For additional information, please use the CmdLets built-in help.
 ```powershell
-Get-Help New-SnsSqliteConnection -Full; 
 Get-Help Invoke-SnsSqliteQuery -Full;
 Get-Help Invoke-SnsSqliteObjectInsert -Full;
 Get-Help Backup-SnsSqliteDataBase -Full;
+Get-Help New-SnsSqliteConnection -Full;
 ```
 
 
 ## Requirements
 
-* .NET Framework 4.5
+* .NET Framework 4.5.2
 * PowerShell 4
 
 
@@ -66,7 +69,7 @@ Install-Module "SnsSqlitePsModule" -Scope "AllUsers";
 OR
 1. Download SnsSqlitePsModule.zip.
 2. Don't forget to check the .ZIP file for viruses and etc.
-3. File MD5 hash: `37942ABF36A7DF53CA1C2D11D67A4015`
+3. File MD5 hash: `95BD11D8F34EA4276185C02E31B7EABE`
 4. Unzip in one of the following folders depending of your preference:
 * `C:\Users\UserName\Documents\WindowsPowerShell\Modules` - Replace "UserName" with the actual username, If you want the module to be available for specific user.
 * `C:\Program Files\WindowsPowerShell\Modules` - If you want the module to be available for all users on the machine.
@@ -75,7 +78,9 @@ OR
 ```powershell
 Get-ChildItem -Path "PathWhereModuleIsInstalled" -Recurse | Unblock-File
 ```
-6. PowerShell Examples:
+
+
+## PowerShell Examples:
 
 * Import the module, create a DataSource, and create a table inside the DataBase file.
 ```powershell
@@ -87,19 +92,12 @@ cd C:\TempDB\
 
 
 # Create "temp.sqlite" DataBase in the working folder and "tbl" table inside the DB
-Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "CREATE TABLE tbl (ID INTEGER, Event VARCHAR(20), Date DATETIME);" `
-	-ReadOnly `
-	-Verbose;
+Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -ReadOnly -Verbose `
+	-Query "CREATE TABLE tbl ([ID] INTEGER, [Message] VARCHAR(500), [Severity] VARCHAR(10), [Date] DATETIME);";
 
 
 # Verify the "tbl" table creation
-$Output = Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "PRAGMA table_info(tbl);" `
-	-ReadOnly `
-	-Verbose;
+$Output = Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "PRAGMA table_info(tbl);" -ReadOnly -Verbose;
 $Output | ft
 
 
@@ -117,8 +115,9 @@ $CmdStart = [System.DateTime]::now;
 	$Params += `
 	@{
 		"ID" = "$($_)";
-		"Event" = "Error";
-		"Date" = [System.DateTime]::UtcNow.AddDays(0 - $_).ToString([SnsSqlitePsModule.TimeFormat]::Utc);
+		"Message" = "Fake Event Message";
+		"Severity" = "Error";
+		"Date" = [System.DateTime]::UtcNow.AddMinutes($_ - 100000);
 	};
 }
 [System.DateTime]::now - $CmdStart;
@@ -126,22 +125,16 @@ $CmdStart = [System.DateTime]::now;
 
 # Insert the large amount of data in the DataBase
 $CmdStart = [System.DateTime]::now;
-$Params | Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);";
+$Params | Invoke-SnsSqliteQuery -DataBase "temp.sqlite" `
+	-Query "INSERT INTO tbl (ID, Message, Severity, Date) VALUES (@ID, @Message, @Severity, @Date);";
 [System.DateTime]::now - $CmdStart;
 
 
 # Query the DataBase about the previously inserted data
 # The output is limited in PowerShell, not in SELECT, to allow all the data to be retrieved from the DataBase
-# Internal measuring accessible via "Verbose" stream is not used because it will generate thousands of screens
-# and will be unable to make the screenshot
-$CmdStart = [System.DateTime]::now;
-$Output = Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "SELECT * FROM tbl;";
-[System.DateTime]::now - $CmdStart;
-$Output | Select-Object -First 10;
+$Output = Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "SELECT ID, Message, Severity FROM tbl;" -Verbose;
+$Output.Count
+$Output | Select-Object -First 2;
 
 
 ```
@@ -151,28 +144,21 @@ $Output | Select-Object -First 10;
 
 
 # Truncate the table
-Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "DELETE FROM tbl;" `
-	-Verbose;
+Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "DELETE FROM tbl;" -Verbose;
 
 
+cls;
 # Insert the large amount of data from previous example in the DataBase using parameters
 $CmdStart = [System.DateTime]::now;
-Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);" `
-	-SqlParameters $Params;
+Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -SqlParameters $Params `
+	-Query "INSERT INTO tbl (ID, Message, Severity, Date) VALUES (@ID, @Message, @Severity, @Date);";
 [System.DateTime]::now - $CmdStart;
 
 
 # Query the DataBase about the previously inserted data
-$CmdStart = [System.DateTime]::now;
-$Output = Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "SELECT * FROM tbl;";
-[System.DateTime]::now - $CmdStart;
-$Output | Select-Object -First 10;
+$Output = Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "SELECT ID, Message, Severity FROM tbl;" -Verbose;
+$Output.Count
+$Output | Select-Object -First 2;
 
 
 ```
@@ -183,9 +169,7 @@ $Output | Select-Object -First 10;
 
 # Create permanent SQLiteConnection object to the existing DataBase
 # Create the Backup DataBase and connect to it
-$ProdConn, $BkpConn = New-SnsSqliteConnection `
-	-DataBase "temp.sqlite", "Backup.sqlite" `
-	-ReadOnly;
+$ProdConn, $BkpConn = New-SnsSqliteConnection -DataBase "temp.sqlite", "Backup.sqlite" -ReadOnly;
 
 
 #Backup the old DataBase into the newly created one
@@ -195,10 +179,7 @@ $ProdConn.BackupDatabase($BkpConn, "main", "main", -1, $null, 0);
 
 
 # Verify whether the data is copied to the new database using the existing permanent connection
-Invoke-SnsSqliteQuery `
-	-SQLiteConnection $BkpConn `
-	-Query "SELECT COUNT(*) FROM tbl;" `
-	-Verbose;
+Invoke-SnsSqliteQuery -SQLiteConnection $BkpConn -Query "SELECT COUNT(*) FROM tbl;" -Verbose;
 
 
 # Close Both Connections
@@ -219,12 +200,7 @@ $BkpConn.Dispose();
 # Initially I've thought that there will be no need of such command
 # However when backing up using the "BackupDatabase" method in scripts, they have to handle so many exceptions
 # So I've created the command to not handle the same exceptions over and over again inside scripts
-$Output = Backup-SnsSqliteDataBase `
-	-DataBase "temp.sqlite" `
-	-Destination "Backup2.sqlite" `
-	-Force `
-	-PassThru `
-	-Verbose;
+$Output = Backup-SnsSqliteDataBase -DataBase "temp.sqlite" -Destination "Backup2.sqlite" -Force -PassThru -Verbose;
 
 
 # When PassThru is specified to Backup-SnsSqliteDataBase CmdLet
@@ -236,10 +212,7 @@ $Output
 
 
 # Verify whether the data is copied to the new database
-Invoke-SnsSqliteQuery `
-	-DataBase "Backup2.sqlite" `
-	-Query "SELECT COUNT(*) FROM tbl;" `
-	-Verbose;
+Invoke-SnsSqliteQuery -DataBase "Backup2.sqlite" -Query "SELECT COUNT(*) FROM tbl;" -Verbose;
 
 
 ```
@@ -262,25 +235,23 @@ $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "
 # Generate InputObject for the second query to insert some data in "tbl" Table
 # The object must have property names matching the CmdLet parameters or their aliases.
 [System.Object]$objObject = New-Object -TypeName "System.Object";
-$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);";
+$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "INSERT INTO tbl (ID, Message, Severity, Date) VALUES (@ID, @Message, @Severity, @Date);";
 $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "SqlParameters" -Value `
 (
-	@{ "ID" = 1; "Event" = "Error"; "Date" = "2020-04-20 10:00:00.000Z"; },
-	@{ "ID" = 2; "Event" = "Warning"; "Date" = "2020-04-20 11:00:00.000Z"; }
+	@{ "ID" = 1; "Message" = "Fake Event Message"; "Severity" = "Error"; "Date" = [System.DateTime]::UtcNow.AddMinutes(-1); },
+	@{ "ID" = 2; "Message" = "Fake Event Message"; "Severity" = "Warning"; "Date" = [System.DateTime]::UtcNow; }
 );
 [System.Object[]]$arrInput += $objObject;
 
 
 # Generate InputObject for the third query to verify the inserting the entry from the second query
 [System.Object]$objObject = New-Object -TypeName "System.Object";
-$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "SELECT * FROM tbl;";
+$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "SELECT ID, Message, Severity FROM tbl;";
 [System.Object[]]$arrInput += $objObject;
 
 
 # Run All The 3 Queries
-$arrInput | Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Verbose | ft;
+$arrInput | Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Verbose | ft;
 
 
 ```
@@ -290,37 +261,45 @@ $arrInput | Invoke-SnsSqliteQuery `
 
 
 # Truncate the table
-Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "DELETE FROM tbl;" `
-	-Verbose;
+Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "DELETE FROM tbl;" -Verbose;
 
 
 # Example how to convert objects to HashTables
 # Keep in mind that the table where they have to be inserted should be already created
-# And the table should have columns like the objects properties
+# And the table should have columns matching the objects properties
 # SQLite have some limitations related with the column names
 # Please refer to SQLite documentation about those
-[System.Object]$objObject = New-Object -TypeName "System.Object";
-$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "ID" -Value 1;
-$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Event" -Value "Warning";
-$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Date" -Value ([System.DateTime]"2020-04-20 10:00:00");
+
+# Generate some test data
+[System.DateTime]$cmdStart = [System.DateTime]::Now;
+[System.Array]$arrInput = @();
+0..100000 | ForEach `
+{
+	[System.Int32]$intI = $_;
+	[System.Object]$objObject = New-Object -TypeName "System.Object";
+	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "ID" -Value $intI;
+	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Message" -Value "Fake Event Message";
+	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Severity" -Value "Warning";
+	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Date" -Value ([System.DateTime]::UtcNow.AddMinutes($intI - 100000));
+	[System.Object[]]$arrInput += $objObject
+}
+[System.DateTime]::Now - $cmdStart;
 
 
 # ToHashTbl() custom method works with PSCustomObject only
 # From other hand any .NET object can be converted to PSCustomObject using "Select-Object *" command
 # The ToHashTbl() method converts single object. Nest it in a loop to convert collection of objects.
-[SnsSqlitePsModule.PsObjectToHashTbl]::ToHashTbl($($objObject | Select-Object *)) | `
-	Invoke-SnsSqliteQuery `
-		-DataBase "temp.sqlite" `
-		-Query "INSERT INTO tbl (ID, Event, Date) VALUES (@ID, @Event, @Date);" `
-		-Verbose;
+[System.DateTime]$cmdStart = [System.DateTime]::Now;
+[SnsSqlitePsModule.PsObjToHashTbl]::ToHashTbl($($arrInput | Select-Object *)) | `
+	Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Verbose `
+		-Query "INSERT INTO tbl (ID, Message, Severity, Date) VALUES (@ID, @Message, @Severity, @Date);";
+[System.DateTime]::Now - $cmdStart;
 
 
-# Verify the data inserting
-Invoke-SnsSqliteQuery `
-	-DataBase "temp.sqlite" `
-	-Query "SELECT * FROM tbl;" | ft;
+# Query the DataBase about the previously inserted data
+$Output = Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "SELECT ID, Message, Severity FROM tbl;" -Verbose;
+$Output.Count
+$Output | Select-Object -First 2;
 
 
 ```
@@ -331,74 +310,36 @@ As it can be seen on the screenshots above, using of dedicated Cmdlet for SQL IN
 ```powershell
 
 
-# Create new DataBase and a table with the specified schema
-Remove-Item -Path "C:\TempDB\temp.sqlite" -Force -Confirm:$false;
-Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Verbose `
-	-Query "CREATE TABLE [tbl] (ID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, Event VARCHAR(20) NOT NULL, Date DATETIME NOT NULL);";
+# Truncate the table
+Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "DELETE FROM tbl;" -Verbose;
 
 
-# Generate some test data
+# Insert the test objects collection without using the pipeline
 [System.DateTime]$cmdStart = [System.DateTime]::Now;
-[System.Object[]]$arrInput = @();
-0..100000 | ForEach `
-{
-	[System.Int32]$intI = $_;
-	[System.Object]$objObject = New-Object -TypeName "System.Object";
-	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "id" -Value $intI;
-	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "event" -Value "Warning";
-	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "date" -Value ([System.DateTime]::Now);
-	[System.Object[]]$arrInput += $objObject
-}
+Invoke-SnsSqliteObjectInsert -DataBase "temp.sqlite" -Table "tbl" -InputObject $arrInput;
 [System.DateTime]::Now - $cmdStart;
 
 
-# Insert the generated test objects collection without using the pipeline
-# The property that corresponds to the table's Primary Key will be ignored
-# In the progressbar can be seen the automatically generated query and the used SQL parameters
-[System.DateTime]$cmdStart = [System.DateTime]::Now;
-Invoke-SnsSqliteObjectInsert -DataBase "C:\TempDB\temp.sqlite" -Table "tbl" -InputObject $arrInput -SkipPrimaryKey;
-[System.DateTime]::Now - $cmdStart;
-
-
-# Verify the insert the entries are filtered in PowerShell after full amount of data retrieval to evaluate the performance
-# As it can be seen in the output the ID column was not used
-# The ID's of the generated objects starts with 0 while the ID's of the Database rows starts with 1
-$CmdStart = [System.DateTime]::now;
-$Output = Invoke-SnsSqliteQuery `
-	-DataBase "C:\TempDB\temp.sqlite" `
-	-Query "SELECT * FROM [tbl];";
-[System.DateTime]::now - $CmdStart;
-$Output | Select-Object -First 10;
-
-
-# Count the rows in the table as we filtered to the first 10 entries
-Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "SELECT COUNT(*) FROM tbl;" -Verbose;
-
+# Query the DataBase about the previously inserted data
+$Output = Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "SELECT ID, Message, Severity FROM tbl;" -Verbose;
+$Output.Count
+$Output | Select-Object -First 2;
 
 # Truncate the table to prepare it for the next test
-Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "DELETE FROM [tbl];" -Verbose;
+Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "DELETE FROM [tbl];" -Verbose;
 
 
 # Insert the same objects collection using Pipeline
 # The performance boost is significant
 [System.DateTime]$cmdStart = [System.DateTime]::Now;
-$arrInput | Invoke-SnsSqliteObjectInsert -DataBase "C:\TempDB\temp.sqlite" -Table "tbl";
+$arrInput | Invoke-SnsSqliteObjectInsert -DataBase "temp.sqlite" -Table "tbl";
 [System.DateTime]::Now - $cmdStart;
 
 
-# Verify the insert
-# As we did not used SkipPrimaryKey the ID property is used in the insert
-# the ID's of the DataBase entries match exactly the ID's in the objects collection
-$CmdStart = [System.DateTime]::now;
-$Output = Invoke-SnsSqliteQuery `
-	-DataBase "C:\TempDB\temp.sqlite" `
-	-Query "SELECT * FROM [tbl];";
-[System.DateTime]::now - $CmdStart;
-$Output | Select-Object -First 10;
-
-
-# Count the rows in the table as we filtered to the first 10 entries
-Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "SELECT COUNT(*) FROM tbl;" -Verbose;
+# Query the DataBase about the previously inserted data
+$Output = Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "SELECT ID, Message, Severity FROM tbl;" -Verbose;
+$Output.Count
+$Output | Select-Object -First 2;
 
 
 ```
@@ -408,7 +349,7 @@ Invoke-SnsSqliteQuery -DataBase "C:\TempDB\temp.sqlite" -Query "SELECT COUNT(*) 
 
 - svesavov on GitHub: [https://github.com/svesavov](https://github.com/svesavov)
 - svesavov on PowerShell Gallery: [https://www.powershellgallery.com/packages/SnsSqlitePsModule/](https://www.powershellgallery.com/packages/SnsSqlitePsModule/)
-- Svetoslav Savov on LinkedIn [https://www.linkedin.com/in/svetoslavsavov](https://www.linkedin.com/in/svetoslavsavov)
+- Svetoslav Savov on LinkedIn: [https://www.linkedin.com/in/svetoslavsavov](https://www.linkedin.com/in/svetoslavsavov)
 - RamblingCookieMonster / PSSQLite: [https://github.com/RamblingCookieMonster/PSSQLite](https://github.com/RamblingCookieMonster/PSSQLite)
 - SQLite V3: [https://sqlite.org/index.html](https://sqlite.org/index.html)
 - SQLite V3 Data Types: [https://www.sqlite.org/datatype3.html](https://www.sqlite.org/datatype3.html)
