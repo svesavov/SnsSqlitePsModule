@@ -222,14 +222,14 @@ Invoke-SnsSqliteQuery -DataBase "Backup2.sqlite" -Query "SELECT COUNT(*) FROM tb
 
 
 # Create an empty array to hold the InputObjects which will be send to "Invoke-SnsSqliteQuery"
-[System.Object[]]$arrInput = @();
+[System.Array]$arrInput = @();
 
 
 # Generate InputObject for the first query to delete all the entries in "tbl" Table
 # The object must have property names matching the CmdLet parameters or their aliases.
 [System.Object]$objObject = New-Object -TypeName "System.Object";
 $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "DELETE FROM tbl;";
-[System.Object[]]$arrInput += $objObject;
+[System.Array]$arrInput += $objObject;
 
 
 # Generate InputObject for the second query to insert some data in "tbl" Table
@@ -241,13 +241,13 @@ $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "SqlParameters" 
 	@{ "ID" = 1; "Message" = "Fake Event Message"; "Severity" = "Error"; "Date" = [System.DateTime]::UtcNow.AddMinutes(-1); },
 	@{ "ID" = 2; "Message" = "Fake Event Message"; "Severity" = "Warning"; "Date" = [System.DateTime]::UtcNow; }
 );
-[System.Object[]]$arrInput += $objObject;
+[System.Array]$arrInput += $objObject;
 
 
 # Generate InputObject for the third query to verify the inserting the entry from the second query
 [System.Object]$objObject = New-Object -TypeName "System.Object";
 $objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Query" -Value "SELECT ID, Message, Severity FROM tbl;";
-[System.Object[]]$arrInput += $objObject;
+[System.Array]$arrInput += $objObject;
 
 
 # Run All The 3 Queries
@@ -281,14 +281,13 @@ Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Query "DELETE FROM tbl;" -Verbose
 	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Message" -Value "Fake Event Message";
 	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Severity" -Value "Warning";
 	$objObject | Add-Member -Force -MemberType "NoteProperty" -Name "Date" -Value ([System.DateTime]::UtcNow.AddMinutes($intI - 100000));
-	[System.Object[]]$arrInput += $objObject
+	[System.Array]$arrInput += $objObject
 }
 [System.DateTime]::Now - $cmdStart;
 
 
 # ToHashTbl() custom method works with PSCustomObject only
 # From other hand any .NET object can be converted to PSCustomObject using "Select-Object *" command
-# The ToHashTbl() method converts single object. Nest it in a loop to convert collection of objects.
 [System.DateTime]$cmdStart = [System.DateTime]::Now;
 [SnsSqlitePsModule.PsObjToHashTbl]::ToHashTbl($($arrInput | Select-Object *)) | `
 	Invoke-SnsSqliteQuery -DataBase "temp.sqlite" -Verbose `
